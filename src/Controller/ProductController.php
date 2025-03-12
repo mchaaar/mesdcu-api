@@ -82,4 +82,27 @@ class ProductController extends AbstractController
             'is_active' => $product->isActive()
         ], Response::HTTP_OK);
     }
+
+    #[Route('/all', name: 'get_all_products', methods: ['GET'])]
+    public function getAllProducts(): JsonResponse
+    {
+        $products = $this->productService->getAllProducts();
+
+        $productsData = [];
+
+        foreach ($products as $product) {
+            $productsData[] = [
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'description' => $product->getDescription(),
+                'price' => $product->getPrice(),
+                'stock' => $product->getStock(),
+                'image_url' => $product->getImageUrl(),
+                'is_active' => $product->isActive(),
+            ];
+        }
+
+        return $this->json($productsData);
+    }
+
 }
