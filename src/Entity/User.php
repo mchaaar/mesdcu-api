@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
+use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -51,13 +51,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ActivityLog::class, mappedBy: "user", orphanRemoval: true)]
     private Collection $logs;
 
+    #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private Collection $subscriptions;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->carts = new ArrayCollection();
         $this->logs = new ArrayCollection();
         $this->registration_date = new \DateTime();
-        $this->roles = ['ROLE_USER']; // Rôle par défaut
+        $this->roles = ['ROLE_USER'];
+        $this->subscriptions = new ArrayCollection();
     }
 
     // ----------------------
@@ -159,13 +163,119 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
-        // Méthode requise par l'interface UserInterface,
-        // à implémenter si tu stockes des infos sensibles
     }
 
     public function getUserIdentifier(): string
     {
-        // Ici, on utilise l’email comme identifiant unique
         return $this->email ?? '';
+    }
+
+    // -------------
+    // ORDERS
+    // -------------
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(Order $order): static
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders->add($order);
+            $order->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeOrder(Order $order): static
+    {
+        if ($this->orders->removeElement($order)) {
+            if ($order->getUser() === $this) {
+                $order->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    // -------------
+    // CARTS
+    // -------------
+    public function getCarts(): Collection
+    {
+        return $this->carts;
+    }
+
+    public function addCart(Cart $cart): static
+    {
+        if (!$this->carts->contains($cart)) {
+            $this->carts->add($cart);
+            $cart->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeCart(Cart $cart): static
+    {
+        if ($this->carts->removeElement($cart)) {
+            if ($cart->getUser() === $this) {
+                $cart->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    // -------------
+    // LOGS
+    // -------------
+    public function getLogs(): Collection
+    {
+        return $this->logs;
+    }
+
+    public function addLog(ActivityLog $log): static
+    {
+        if (!$this->logs->contains($log)) {
+            $this->logs->add($log);
+            $log->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeLog(ActivityLog $log): static
+    {
+        if ($this->logs->removeElement($log)) {
+            if ($log->getUser() === $this) {
+                $log->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    // ============= SUBSCRIPTIONS =============
+    /**
+     * @return Collection<int, Subscription>
+     */
+    public function getSubscriptions(): Collection
+    {
+        return $this->subscriptions;
+    }
+
+    public function addSubscription(Subscription $subscription): static
+    {
+        if (!$this->subscriptions->contains($subscription)) {
+            $this->subscriptions->add($subscription);
+            $subscription->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeSubscription(Subscription $subscription): static
+    {
+        if ($this->subscriptions->removeElement($subscription)) {
+            if ($subscription->getUser() === $this) {
+                $subscription->setUser(null);
+            }
+        }
+        return $this;
     }
 }
