@@ -32,7 +32,6 @@ class Subscription
 
     public function __construct()
     {
-        // On peut initialiser la date d'abonnement
         $this->createdAt = new \DateTime();
     }
 
