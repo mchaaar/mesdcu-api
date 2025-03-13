@@ -16,28 +16,22 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    //    /**
-    //     * @return Product[] Returns an array of Product objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Product
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findAllByUserWithSubscription(int $userId): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select(
+                'p.id AS id',
+                'p.name AS name',
+                'p.description AS description',
+                'p.price AS price',
+                'p.stock AS stock',
+                'p.is_active AS isActive',
+                "CASE WHEN s.id IS NOT NULL THEN true ELSE false END AS subscribed"
+            )
+            ->leftJoin('App\Entity\Subscription', 's', 'WITH', 's.product = p AND s.user = :userId')
+            ->where('p.is_active = true')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

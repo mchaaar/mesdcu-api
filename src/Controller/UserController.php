@@ -23,10 +23,10 @@ class UserController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (
-            !isset($data['email'], $data['password'], $data['first_name'], $data['last_name'])
+            !isset($data['email'], $data['password'], $data['first_name'], $data['last_name'], $data ['phone'])
         ) {
             return new JsonResponse([
-                'error' => 'Missing email, password, first_name or last_name'
+                'error' => 'Missing email, password, first_name, last_name or phone'
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -39,7 +39,7 @@ class UserController extends AbstractController
 
         $user = new User();
         $user->setEmail($data['email']);
-        // $user->setPhone($data['phone']);
+        $user->setPhone($data['phone']);
         $user->setFirstName($data['first_name']);
         $user->setLastName($data['last_name']);
 
@@ -65,10 +65,12 @@ class UserController extends AbstractController
         }
 
         return new JsonResponse([
-            'id'    => $user->getId(),
-            'email' => $user->getEmail(),
-            'phone' => $user->getPhone(),
-            'roles' => $user->getRoles(),
+            'first_name'    => $user->getFirstName(),
+            'last_name'     => $user->getLastName(),
+            'id'            => $user->getId(),
+            'email'         => $user->getEmail(),
+            'phone'         => $user->getPhone(),
+            'roles'         => $user->getRoles(),
         ], Response::HTTP_OK);
     }
 }
