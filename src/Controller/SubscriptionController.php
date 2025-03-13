@@ -49,4 +49,33 @@ class SubscriptionController extends AbstractController
             'subscriptionId' => $subscription->getId()
         ], Response::HTTP_CREATED);
     }
+
+    #[Route('/remove', name: 'subscription_remove', methods: ['DELETE'])]
+    public function removeSubscription(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $userId    = $data['userId'] ?? null;
+        $productId = $data['productId'] ?? null;
+
+        if (!$userId || !$productId) {
+            return $this->json(['error' => 'Missing userId or productId'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $subscription = $em->getRepository(Subscription::class)->findOneBy([
+            'user'    => $userId,
+            'product' => $productId,
+        ]);
+
+        if (!$subscription) {
+            return $this->json(['error' => 'No subscription found for given userId/productId'], Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($subscription);
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Subscription removed successfully'
+        ], Response::HTTP_OK);
+    }
 }
