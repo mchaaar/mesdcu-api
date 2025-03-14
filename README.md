@@ -1,11 +1,11 @@
-# mchaaar-mesdcu-api
+# mesdcu-api
 
 API REST développée avec **Symfony 7.2**, utilisant Doctrine ORM pour la gestion des données et Lexik JWT Authentication pour l'authentification sécurisée par tokens JWT.
 
 ## 📁 Structure du projet
 
 ```
-mchaaar-mesdcu-api/
+mesdcu-api/
 ├── assets/ (JS, CSS, Stimulus controllers)
 ├── bin/ (Scripts CLI)
 ├── config/ (Configuration Symfony, routes, services)
@@ -23,8 +23,8 @@ mchaaar-mesdcu-api/
 
 1. Clone le repository :
 ```bash
-git clone https://github.com/ton-utilisateur/mchaaar-mesdcu-api.git
-cd mchaaar-mesdcu-api
+git clone https://github.com/ton-utilisateur/mesdcu-api.git
+cd mesdcu-api
 ```
 
 2. Installe les dépendances :
