@@ -11,10 +11,44 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Annotations as OA;
+use Nelmio\ApiDocBundle\Annotation\Security;
 
 #[Route('/api/subscriptions')]
 class SubscriptionController extends AbstractController
 {
+    /**
+     * @OA\Post(
+     *     path="/api/subscriptions/add",
+     *     summary="Create a subscription",
+     *     description="Creates a new subscription linking a user and a product.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"userId", "productId"},
+     *             @OA\Property(property="userId", type="integer", example=1),
+     *             @OA\Property(property="productId", type="integer", example=42)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Subscription created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Subscription created successfully"),
+     *             @OA\Property(property="subscriptionId", type="integer", example=5)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Missing userId or productId"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User or Product not found"
+     *     )
+     * )
+     * @Security(name="Bearer")
+     */
     #[Route('/add', name: 'subscription_add', methods: ['POST'])]
     public function addSubscription(Request $request, EntityManagerInterface $em): JsonResponse
     {
@@ -50,6 +84,37 @@ class SubscriptionController extends AbstractController
         ], Response::HTTP_CREATED);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/subscriptions/remove",
+     *     summary="Remove a subscription",
+     *     description="Removes a subscription linking a user and a product.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"userId", "productId"},
+     *             @OA\Property(property="userId", type="integer", example=1),
+     *             @OA\Property(property="productId", type="integer", example=42)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Subscription removed successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Subscription removed successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Missing userId or productId"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No subscription found for given userId/productId"
+     *     )
+     * )
+     * @Security(name="Bearer")
+     */
     #[Route('/remove', name: 'subscription_remove', methods: ['DELETE'])]
     public function removeSubscription(Request $request, EntityManagerInterface $em): JsonResponse
     {
